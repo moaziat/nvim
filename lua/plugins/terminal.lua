@@ -24,8 +24,10 @@ return {
     end
     vim.o.shell = shell
 
+    local bottom_height = 6
+
     require("toggleterm").setup({
-      size = 6,
+      size = bottom_height,
       open_mapping = nil,
       direction = "horizontal",
       shade_terminals = true,
@@ -43,11 +45,34 @@ return {
       close_on_exit = false,
     })
 
+    local function ensure_bottom_term_layout()
+      if not bottom_term:is_open() then
+        return
+      end
+      local winid = vim.fn.bufwinid(bottom_term.bufnr or -1)
+      if winid == -1 or not vim.api.nvim_win_is_valid(winid) then
+        return
+      end
+
+      local current = vim.api.nvim_get_current_win()
+      vim.api.nvim_set_current_win(winid)
+      vim.cmd("wincmd J")
+      vim.api.nvim_win_set_height(winid, bottom_height)
+      vim.api.nvim_set_current_win(current)
+    end
+
     vim.api.nvim_create_autocmd("VimEnter", {
       callback = function()
         vim.schedule(function()
-          bottom_term:open(6)
+          bottom_term:open(bottom_height)
+          ensure_bottom_term_layout()
         end)
+      end,
+    })
+
+    vim.api.nvim_create_autocmd({ "VimResized", "WinResized" }, {
+      callback = function()
+        vim.schedule(ensure_bottom_term_layout)
       end,
     })
 
@@ -55,7 +80,8 @@ return {
       if bottom_term:is_open() then
         vim.cmd("wincmd j")
       else
-        bottom_term:open(6)
+        bottom_term:open(bottom_height)
+        ensure_bottom_term_layout()
       end
     end
 
