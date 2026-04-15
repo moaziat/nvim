@@ -30,6 +30,6 @@ return {
     })
 
     -- load the colorscheme
-    vim.cmd("colorscheme kanagawa-wave")
+    vim.cmd("colorscheme kanagawa-dragon")
   end,
 }
