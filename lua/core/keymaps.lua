@@ -1,17 +1,19 @@
--- File tree
-vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
+local function map(mode, lhs, rhs, desc)
+  vim.keymap.set(mode, lhs, rhs, { noremap = true, silent = true, desc = desc })
+end
 
--- Auto open NvimTree when starting Neovim in a directory
-vim.cmd([[
-  autocmd VimEnter * NvimTreeOpen
-]])
+-- Files
+map("n", "<leader>e", ":NvimTreeToggle<CR>", "Toggle file tree")
+map("n", "<C-n>", ":NvimTreeToggle<CR>", "Toggle file tree")
+map({ "n", "i", "v" }, "<C-s>", "<cmd>write<CR>", "Save file")
+map("n", "<leader>w", "<cmd>write<CR>", "Save file")
 
--- Telescope
-vim.keymap.set("n", "<leader>ff", ":Telescope find_files<CR>")
-vim.keymap.set("n", "<leader>fg", ":Telescope live_grep<CR>")
+-- Clipboard-friendly copy/paste over SSH through OSC52.
+map({ "n", "v" }, "<C-c>", '"+y', "Copy")
+map({ "n", "v" }, "<C-v>", '"+p', "Paste")
+map("i", "<C-v>", "<C-r>+", "Paste")
 
--- LSP
-vim.keymap.set("n", "gd", vim.lsp.buf.definition)
-vim.keymap.set("n", "K", vim.lsp.buf.hover)
-
+-- Diagnostics
+map("n", "[d", vim.diagnostic.goto_prev, "Previous diagnostic")
+map("n", "]d", vim.diagnostic.goto_next, "Next diagnostic")
+map("n", "<leader>q", vim.diagnostic.setloclist, "Diagnostics list")
