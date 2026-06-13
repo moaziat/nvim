@@ -6,13 +6,15 @@ return {
     "nvim-tree/nvim-web-devicons",
   },
   config = function()
+    vim.g.loaded_netrw = 1
+    vim.g.loaded_netrwPlugin = 1
+
     local nvim_tree = require("nvim-tree")
 
     nvim_tree.setup({
-      -- Enable Line Numbers
       view = {
-        number = true,         -- This enables absolute line numbers
-        relativenumber = true, -- Set to true if you prefer relative numbers
+        number = true,
+        relativenumber = true,
         width = 30,
         side = "left",
       },
@@ -33,9 +35,14 @@ return {
         enable = true,
         show_on_dirs = true,
       },
+      actions = {
+        open_file = {
+          quit_on_open = false,
+          resize_window = true,
+        },
+      },
     })
 
-    -- Open NvimTree automatically when opening Neovim
     vim.api.nvim_create_autocmd("VimEnter", {
       callback = function()
         if vim.fn.argc() == 0 then
