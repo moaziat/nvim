@@ -9,12 +9,17 @@ vim.opt.termguicolors = true
 vim.opt.signcolumn = "yes"
 vim.opt.cursorline = true
 
--- Tabs / indentation
+-- Tabs / indentation: VS Code-style 4-space defaults.
+vim.g.python_recommended_style = 0
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
+vim.opt.softtabstop = 4
 vim.opt.expandtab = true
+vim.opt.smarttab = true
+vim.opt.shiftround = true
 vim.opt.autoindent = true
 vim.opt.smartindent = true
+vim.opt.breakindent = true
 
 -- Scrolling
 vim.opt.wrap = false

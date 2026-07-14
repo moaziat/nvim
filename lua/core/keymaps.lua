@@ -8,6 +8,10 @@ map("n", "<C-n>", ":NvimTreeToggle<CR>", "Toggle file tree")
 map({ "n", "i", "v" }, "<C-s>", "<cmd>write<CR>", "Save file")
 map("n", "<leader>w", "<cmd>write<CR>", "Save file")
 
+-- VS Code-style selection indentation.
+map("v", "<Tab>", ">gv", "Indent selection")
+map("v", "<S-Tab>", "<gv", "Outdent selection")
+
 -- Clipboard-friendly copy/paste over SSH through OSC52.
 map({ "n", "v" }, "<C-c>", '"+y', "Copy")
 map({ "n", "v" }, "<C-v>", '"+p', "Paste")

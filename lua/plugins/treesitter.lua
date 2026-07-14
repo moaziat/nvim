@@ -10,7 +10,10 @@ return {
     ts.setup({
       ensure_installed = { "lua", "python", "c", "cpp", "cuda", "bash", "cmake", "json", "toml", "yaml" },
       highlight = { enable = true },
-      indent = { enable = true },
+      indent = {
+        enable = true,
+        disable = { "python", "c", "cpp", "cuda" },
+      },
     })
   end,
 }
