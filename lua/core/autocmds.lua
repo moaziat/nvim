@@ -8,6 +8,29 @@ vim.filetype.add({
   },
 })
 
+local function set_indent(width, expandtab)
+  vim.bo.tabstop = width
+  vim.bo.shiftwidth = width
+  vim.bo.softtabstop = expandtab and width or 0
+  vim.bo.expandtab = expandtab
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+  desc = "Use VS Code-style 4-space indentation for development buffers",
+  pattern = { "python", "c", "cpp", "cuda", "cmake", "lua", "sh", "bash", "zsh" },
+  callback = function()
+    set_indent(4, true)
+  end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  desc = "Use real tabs for Makefiles",
+  pattern = { "make" },
+  callback = function()
+    set_indent(4, false)
+  end,
+})
+
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight yanked text",
   callback = function()
