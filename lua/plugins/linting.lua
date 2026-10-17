@@ -45,14 +45,12 @@ return {
     end
 
     local group = vim.api.nvim_create_augroup("user_lint", { clear = true })
-    vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave" }, {
+    vim.api.nvim_create_autocmd("BufWritePost", {
       group = group,
       callback = function(args)
         local linter = linters_for_buffer(args.buf)
         if linter then
           lint.try_lint(linter)
-        else
-          vim.diagnostic.reset(nil, args.buf)
         end
       end,
     })

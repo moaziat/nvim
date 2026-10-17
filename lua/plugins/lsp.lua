@@ -1,94 +1,114 @@
 return {
-  "neovim/nvim-lspconfig",
-  tag = "v1.8.0",
-  event = { "BufReadPre", "BufNewFile" },
-  dependencies = { "hrsh7th/cmp-nvim-lsp" },
-  config = function()
-    local lspconfig = require("lspconfig")
-    local project = require("core.project")
-    local util = require("lspconfig.util")
+  {
+    "neovim/nvim-lspconfig",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
+      "saghen/blink.cmp",
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+    },
+    config = function()
+      local project = require("core.project")
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
 
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    local ok_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-    if ok_cmp then
-      capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
-    end
-
-    local function lsp_keymaps(_, bufnr)
-      local function map(lhs, rhs, desc)
-        vim.keymap.set("n", lhs, rhs, { buffer = bufnr, silent = true, desc = desc })
-      end
-
-      map("gd", vim.lsp.buf.definition, "Go to definition")
-      map("gD", vim.lsp.buf.declaration, "Go to declaration")
-      map("gi", vim.lsp.buf.implementation, "Go to implementation")
-      map("gr", vim.lsp.buf.references, "References")
-      map("K", vim.lsp.buf.hover, "Hover")
-      map("<leader>rn", vim.lsp.buf.rename, "Rename symbol")
-      map("<leader>ca", vim.lsp.buf.code_action, "Code action")
-      map("<leader>lf", function()
-        vim.lsp.buf.format({ async = true })
-      end, "Format buffer")
-    end
-
-    local pyright = project.first_executable({
-      project.mason_bin("pyright-langserver"),
-      vim.fn.exepath("pyright-langserver"),
-    })
-
-    if pyright then
-      lspconfig.pyright.setup({
-        cmd = { pyright, "--stdio" },
+      vim.lsp.config("*", {
         capabilities = capabilities,
-        on_attach = lsp_keymaps,
-        root_dir = util.root_pattern("uv.lock", "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", ".git"),
+        root_markers = { ".git" },
+      })
+
+      vim.lsp.config("lua_ls", {
+        settings = {
+          Lua = {
+            completion = { callSnippet = "Replace" },
+            diagnostics = { globals = { "vim", "Snacks" } },
+            hint = { enable = true },
+            runtime = { version = "LuaJIT" },
+            workspace = {
+              checkThirdParty = false,
+              library = { vim.env.VIMRUNTIME },
+            },
+          },
+        },
+      })
+
+      vim.lsp.config("pyright", {
+        root_markers = { "uv.lock", "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", ".git" },
         settings = {
           python = {
             analysis = {
               autoImportCompletions = true,
-              autoSearchPaths = true,
               diagnosticMode = "openFilesOnly",
               typeCheckingMode = "basic",
               useLibraryCodeForTypes = true,
             },
           },
         },
-        on_new_config = function(new_config, root_dir)
-          local python = project.python_path(root_dir)
-          new_config.settings.python.pythonPath = python
-          if root_dir and project.executable(root_dir .. "/.venv/bin/python") then
-            new_config.settings.python.venvPath = root_dir
-            new_config.settings.python.venv = ".venv"
-          end
+        before_init = function(_, config)
+          config.settings.python.pythonPath = project.python_path(config.root_dir)
         end,
       })
-    end
 
-    local clangd = project.first_executable({
-      project.mason_bin("clangd"),
-      vim.fn.exepath("clangd"),
-    })
-
-    if clangd then
-      lspconfig.clangd.setup({
+      vim.lsp.config("clangd", {
         cmd = {
-          clangd,
+          "clangd",
           "--background-index",
-          "--clang-tidy",
           "--completion-style=detailed",
-          "--header-insertion=iwyu",
+          "--header-insertion=never",
           "--pch-storage=memory",
-          "--query-driver=/usr/bin/clang++,/usr/bin/g++,/usr/bin/c++,/usr/bin/mpicxx,/usr/bin/nvcc,/opt/*/bin/*",
+          "--query-driver=/usr/bin/clang*,/usr/bin/g++*,/usr/bin/c++*,/opt/homebrew/bin/*,/opt/homebrew/opt/llvm/bin/clang*,/usr/local/bin/*,/usr/local/cuda/bin/nvcc,/opt/*/bin/*",
         },
-        capabilities = capabilities,
-        on_attach = lsp_keymaps,
         filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
-        root_dir = util.root_pattern("compile_commands.json", "compile_flags.txt", ".clangd", ".git"),
+        root_markers = { "compile_commands.json", "compile_flags.txt", ".clangd", ".git" },
         init_options = {
           clangdFileStatus = true,
           fallbackFlags = { "-std=c++17" },
         },
       })
-    end
-  end,
+
+      vim.lsp.config("neocmake", {
+        root_markers = { "CMakePresets.json", "CMakeLists.txt", ".git" },
+      })
+
+      vim.lsp.config("rust_analyzer", {
+        settings = {
+          ["rust-analyzer"] = {
+            cargo = { allFeatures = true },
+            check = { command = "clippy" },
+            procMacro = { enable = true },
+            inlayHints = {
+              bindingModeHints = { enable = true },
+              closureReturnTypeHints = { enable = "with_block" },
+              lifetimeElisionHints = { enable = "skip_trivial" },
+            },
+          },
+        },
+      })
+
+      vim.lsp.config("ts_ls", {
+        root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
+      })
+
+      vim.lsp.enable({
+        "lua_ls",
+        "pyright",
+        "clangd",
+        "neocmake",
+        "rust_analyzer",
+        "bashls",
+        "jsonls",
+        "yamlls",
+        "ts_ls",
+      })
+    end,
+  },
+
+  {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    opts = {
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    },
+  },
 }

@@ -2,19 +2,33 @@ local M = {}
 
 local uv = vim.uv or vim.loop
 
+function M.workspace()
+  return vim.g.workspace_root or uv.cwd() or vim.fn.getcwd()
+end
+
 function M.root(bufnr, markers)
   bufnr = bufnr or 0
   markers = markers or { "uv.lock", "pyproject.toml", "compile_commands.json", ".git" }
 
   local name = vim.api.nvim_buf_get_name(bufnr)
-  local start = name ~= "" and vim.fs.dirname(name) or uv.cwd()
-  local found = vim.fs.find(markers, { path = start, upward = true })[1]
+  local start = name ~= "" and vim.fs.dirname(name) or M.workspace()
+  local workspace = vim.fs.normalize(M.workspace())
+
+  -- Never discover a project marker above the directory used to launch Nvim.
+  if not vim.fs.relpath(workspace, start) then
+    start = workspace
+  end
+  local found = vim.fs.find(markers, {
+    path = start,
+    upward = true,
+    stop = vim.fs.dirname(workspace),
+  })[1]
 
   if found then
     return vim.fs.dirname(found)
   end
 
-  return start
+  return workspace
 end
 
 function M.executable(path)

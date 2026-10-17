@@ -1,19 +1,73 @@
-return {
-  "nvim-treesitter/nvim-treesitter",
-  build = ":TSUpdate",
-  config = function()
-    local ok, ts = pcall(require, "nvim-treesitter.configs")
-    if not ok then
-      return
-    end
+local parsers = {
+  "bash",
+  "c",
+  "cmake",
+  "comment",
+  "cpp",
+  "css",
+  "diff",
+  "dockerfile",
+  "git_config",
+  "git_rebase",
+  "gitcommit",
+  "gitignore",
+  "html",
+  "javascript",
+  "json",
+  "lua",
+  "luadoc",
+  "markdown",
+  "markdown_inline",
+  "python",
+  "query",
+  "regex",
+  "rust",
+  "toml",
+  "tsx",
+  "typescript",
+  "vim",
+  "vimdoc",
+  "yaml",
+}
 
-    ts.setup({
-      ensure_installed = { "lua", "python", "c", "cpp", "cuda", "bash", "cmake", "json", "toml", "yaml" },
-      highlight = { enable = true },
-      indent = {
-        enable = true,
-        disable = { "python", "c", "cpp", "cuda" },
-      },
-    })
-  end,
+return {
+  {
+    "nvim-treesitter/nvim-treesitter",
+    branch = "main",
+    lazy = false,
+    build = ":TSUpdate",
+    config = function()
+      local treesitter = require("nvim-treesitter")
+      treesitter.setup({})
+      vim.treesitter.language.register("json", "jsonc")
+      vim.treesitter.language.register("cpp", "cuda")
+
+      local installed = {}
+      for _, language in ipairs(treesitter.get_installed("parsers")) do
+        installed[language] = true
+      end
+      local missing = vim.tbl_filter(function(language)
+        return not installed[language]
+      end, parsers)
+      if #missing > 0 then
+        treesitter.install(missing)
+      end
+
+      local group = vim.api.nvim_create_augroup("user_treesitter", { clear = true })
+      vim.api.nvim_create_autocmd("FileType", {
+        group = group,
+        callback = function(event)
+          pcall(vim.treesitter.start, event.buf)
+          if vim.bo[event.buf].filetype ~= "python" then
+            vim.bo[event.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
+      })
+    end,
+  },
+  {
+    "windwp/nvim-ts-autotag",
+    ft = { "html", "javascriptreact", "typescriptreact", "tsx" },
+    opts = {},
+  },
 }

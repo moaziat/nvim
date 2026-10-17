@@ -1,0 +1,70 @@
+return {
+  {
+    "nwiizo/codex.nvim",
+    event = "VeryLazy",
+    cmd = {
+      "Codex",
+      "CodexOpen",
+      "CodexClose",
+      "CodexFocus",
+      "CodexResume",
+      "CodexContinue",
+      "CodexReview",
+      "CodexPrompt",
+      "CodexAsk",
+      "CodexAskVisual",
+      "CodexFollowUp",
+      "CodexEdit",
+      "CodexSendVisual",
+      "CodexAddVisual",
+      "CodexAdd",
+      "CodexTreeAdd",
+      "CodexInterrupt",
+      "CodexStatus",
+      "CodexStop",
+      "CodexHealth",
+    },
+    opts = {
+      -- The terminal backend keeps the full Codex transcript, commands, and
+      -- approval flow visible. It is deliberately not a hidden auto-agent.
+      backend = "terminal",
+      cmd = { "codex" },
+      cwd = function()
+        return require("core.project").workspace()
+      end,
+      focus_after_send = true,
+      terminal = {
+        layout = "split",
+        split_side = "right",
+        split_width_percentage = 0.38,
+        auto_insert = true,
+        auto_close = true,
+        hide_keys = { "<C-/>", "<C-_>" },
+        normal_mode_keys = { "<M-n>" },
+        window_navigation = {
+          left = "<M-h>",
+          down = "<M-j>",
+          up = "<M-k>",
+          right = "<M-l>",
+        },
+      },
+      selection = {
+        enabled = true,
+        hint = true,
+        keymaps = { ask = "<leader>aq", edit = "<leader>ae" },
+      },
+    },
+    keys = {
+      { "<leader>aa", "<cmd>CodexFocus<CR>", desc = "Focus or hide Codex" },
+      { "<leader>aq", "<cmd>CodexAsk<CR>", desc = "Ask Codex about this file" },
+      { "<leader>af", "<cmd>CodexAdd<CR>", desc = "Add current file to Codex" },
+      { "<leader>ar", "<cmd>CodexResume<CR>", desc = "Resume a Codex session" },
+      { "<leader>aR", "<cmd>CodexReview --uncommitted<CR>", desc = "Review uncommitted changes" },
+      { "<leader>ai", "<cmd>CodexInterrupt<CR>", desc = "Interrupt Codex" },
+      { "<leader>ax", "<cmd>CodexStop<CR>", desc = "Stop Codex" },
+      { "<leader>aq", ":<C-U>CodexAskVisual<CR>", mode = "x", desc = "Ask Codex about selection" },
+      { "<leader>ae", ":<C-U>CodexEdit<CR>", mode = "x", desc = "Ask Codex to edit selection" },
+      { "<leader>as", ":<C-U>CodexSendVisual<CR>", mode = "x", desc = "Send selection to Codex" },
+    },
+  },
+}

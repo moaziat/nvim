@@ -1,48 +1,50 @@
 return {
-  "hrsh7th/nvim-cmp",
-  dependencies = {
-    "hrsh7th/cmp-nvim-lsp",
-    "hrsh7th/cmp-buffer",
-    "L3MON4D3/LuaSnip",
-    "saadparwaiz1/cmp_luasnip",
+  {
+    "saghen/blink.cmp",
+    version = "1.*",
+    event = { "InsertEnter", "CmdlineEnter" },
+    dependencies = { "rafamadriz/friendly-snippets" },
+    opts = {
+      keymap = { preset = "super-tab" },
+      appearance = {
+        -- Keep the menu clean even when the terminal does not use a Nerd Font.
+        kind_icons = {
+          Text = "txt",
+          Method = "m",
+          Function = "fn",
+          Constructor = "new",
+          Field = "field",
+          Variable = "var",
+          Class = "class",
+          Interface = "interface",
+          Module = "module",
+          Property = "prop",
+          Unit = "unit",
+          Value = "value",
+          Enum = "enum",
+          Keyword = "key",
+          Snippet = "snip",
+          Color = "color",
+          File = "file",
+          Reference = "ref",
+          Folder = "dir",
+          EnumMember = "enum",
+          Constant = "const",
+          Struct = "struct",
+          Event = "event",
+          Operator = "op",
+          TypeParameter = "type",
+        },
+      },
+      completion = {
+        documentation = { auto_show = true, auto_show_delay_ms = 250 },
+        ghost_text = { enabled = true },
+        menu = { border = "rounded" },
+      },
+      signature = { enabled = true, window = { border = "rounded" } },
+      sources = { default = { "lsp", "path", "snippets", "buffer" } },
+      fuzzy = { implementation = "prefer_rust_with_warning" },
+    },
+    opts_extend = { "sources.default" },
   },
-  config = function()
-    local cmp = require("cmp")
-    local luasnip = require("luasnip")
-
-    cmp.setup({
-      snippet = {
-        expand = function(args)
-          luasnip.lsp_expand(args.body)
-        end,
-      },
-      mapping = cmp.mapping.preset.insert({
-        ["<C-Space>"] = cmp.mapping.complete(),
-        ["<Tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_next_item()
-          elseif luasnip.expand_or_jumpable() then
-            luasnip.expand_or_jump()
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-        ["<S-Tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_prev_item()
-          elseif luasnip.jumpable(-1) then
-            luasnip.jump(-1)
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-        ["<CR>"] = cmp.mapping.confirm({ select = true }),
-      }),
-      sources = {
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-        { name = "buffer" },
-      },
-    })
-  end,
 }
