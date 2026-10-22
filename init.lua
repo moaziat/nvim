@@ -58,7 +58,7 @@ require("core.keymaps")
 require("lazy").setup("plugins", {
   checker = { enabled = false },
   change_detection = { notify = false },
-  install = { missing = true, colorscheme = { "oxocarbon", "habamax" } },
+  install = { missing = true, colorscheme = { "fluoromachine", "github_light_default", "habamax" } },
   ui = { border = "rounded" },
   performance = {
     rtp = {

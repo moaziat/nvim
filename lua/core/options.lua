@@ -70,6 +70,10 @@ vim.opt.timeoutlen = 400
 vim.opt.ttimeoutlen = 10
 vim.opt.autoread = true
 
+-- Terminal jobs contain transient PIDs and launcher paths. Never serialize
+-- them into persistence.nvim sessions; tools such as Codex start fresh.
+vim.opt.sessionoptions:remove("terminal")
+
 -- Start unfolded, but keep folds available with zc/zo.
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99

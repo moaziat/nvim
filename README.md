@@ -23,8 +23,8 @@ Lazy installs plugins automatically. Mason then installs the configured
 language servers and formatters in the background. Use `:Lazy`, `:Mason`, and
 `:checkhealth` to inspect them.
 
-The UI intentionally uses readable text and ASCII status signs, so a Nerd Font
-is optional rather than required.
+The UI uses readable text and restrained status signs. A Nerd Font is
+recommended for the colored file and folder icons in the explorer.
 
 ## Daily keys
 
@@ -46,13 +46,25 @@ is optional rather than required.
 | `Space c f` | Format buffer or selection |
 | `Space u f` | Toggle format-on-save |
 | `Space u m` | Toggle rendered Markdown |
-| `Space u t` | Toggle daylight / dark theme |
+| `Space u t` | Toggle GitHub light / Fluoromachine dark |
 | `s` | Fast jump anywhere visible |
 | `g s a` / `g s d` / `g s r` | Add / delete / replace surroundings |
 | `Space t t` or `Ctrl-/` | Floating shell |
 | `Space m c` / `Space m b` | Configure / build CMake project |
 | `Space m r` / `Space m t` | Run / select CMake target |
 | `Esc Esc` | Leave terminal input mode |
+
+The sidebar uses theme-colored file icons, tree guides, current-file and Git
+highlights, and always sorts folders above files. Inside it, use `Enter` or `l`
+to open, `h` to close a folder, `v` for a vertical split, `s` for a horizontal
+split, and `?` for the complete explorer help. It remains rooted at the
+directory where Neovim was launched.
+
+The default theme is Fluoromachine on a neutral graphite background, with
+explicit Tree-sitter and LSP semantic colors for types, functions, methods,
+members, macros, decorators, and parameters. `Space u t` switches between the
+graphite Fluoromachine dark mode and GitHub Light Default for a polished,
+high-readability daytime view.
 
 Normal yanks and puts use the macOS system clipboard. In Terminal, iTerm2, or
 Ghostty, Command-C and Command-V continue to work at the terminal level.
@@ -76,6 +88,7 @@ Run `codex` once in a shell first and sign in if needed.
 | `Space a r` | Resume a previous Codex session |
 | `Space a R` | Ask Codex to review uncommitted changes |
 | `Space a i` / `Space a x` | Interrupt / stop Codex |
+| `Space a h` | Check the Codex integration and executable |
 
 Codex edits are never staged automatically. Changed lines appear immediately
 through Git signs. Use `Space g p` to preview one hunk or `Space g d` for a
@@ -83,6 +96,16 @@ side-by-side review of the whole working tree. Stage or reset hunks explicitly
 with `Space g s` and `Space g r`.
 
 The terminal backend is intentional: it is the stable, transparent workflow.
+It launches the official CLI directly from a stable install path, gives each
+Neovim instance its own process, and preserves the terminal transcript if the
+process exits. Every Neovim Codex session starts in the `workspace-write`
+sandbox with `on-request` approvals: it can work inside the project where
+Neovim was launched, but must ask before accessing anything outside that
+boundary. Terminal jobs are excluded from saved Neovim sessions so a restore
+cannot revive a stale Codex PID or temporary launcher path. Press `Space a a`
+to start a fresh process after an exit; use `Space a h` or `:CodexHealth` if
+startup fails.
+
 The plugin's native app-server UI can show application-managed diffs, but that
 upstream protocol is still experimental.
 
